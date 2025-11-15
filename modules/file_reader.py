@@ -25,5 +25,5 @@ def get_file_metadata(file_path : str):
         "size" :stats.st_size ,
         "last_modified" : stats.st_mtime
     }
-    return stats
+    return result
 

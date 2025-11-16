@@ -1,6 +1,6 @@
 import re
 from ftfy import fix_text
-from utils.utils import find_nth
+from utils.utils import find_nth , get_fin
 from collections import Counter
 
 def text_cleaner(text_dict : dict) -> str:
@@ -19,7 +19,7 @@ def text_cleaner(text_dict : dict) -> str:
     return cleaned_pages
 
 def clean_page(page: str) -> str:
-    
+
     clean_text = re.sub(r"-\n", "", page)
     clean_text = re.sub(r"\n{2,}", "\n\n", clean_text)
     clean_text = re.sub(r"[ \t]+", " ", clean_text)
@@ -29,7 +29,7 @@ def clean_page(page: str) -> str:
     clean_text = re.sub(r"(?m)^[\s\-\u2010-\u2015]*[ivxlcdmIVXLCDM]+\s*$", "", clean_text)
     clean_text = re.sub(r"(?m)^\s*\d+\s*$", "", clean_text)
 
-    return clean_text.strip()
+    return clean_text
 
 def get_repeated_line(text_dict : dict , num_pages : int) -> list:
     repeated_line = []
@@ -62,3 +62,55 @@ def cal_per(liste : list , num_pages : int) -> dict:
     for line , count in presence_counter.items(): 
         result[line] = (count / num_pages) 
     return result
+
+
+def structure_segmentation(pages : list) -> dict:
+    sections = []
+    header_pattern = r"^(Chapter\s+\d+|Section\s+\d+(\.\d+)*|Part\s+[IVXLC]+|[A-Z][a-zA-Z0-9\s]{1,50}\n[-=]{2,})$"
+    c_pos = 0
+    current_page = 0
+    e_pos = get_fin(pages)
+    while (c_pos < e_pos):
+        section= find_next_header(pages , current_page , c_pos , header_pattern)
+        if section is None:
+            break
+        sections.append(section)
+    return sections
+
+
+def find_next_header(pages : list, current_page : int, c_pos : int, header_pattern : str) -> dict:
+    """Search for the next header"""
+    
+    try:
+        pattern = re.compile(header_pattern, re.MULTILINE) #makes it match at the start of each line
+    except re.error as e:
+        print(f"Invalid regex pattern: {e}")
+        return None
+
+    # Loop through the pages starting from the current one
+    for i in range(current_page, len(pages)):
+        page_text = pages[i]
+        
+        # Determine where to start searching on this page
+        start_search_index = 0 # by default, start at the beginning of the page
+        if i == current_page:
+            start_search_index = c_pos # if we are on the current page , we start from c_pos
+        
+        text_to_search = page_text[start_search_index:]
+        
+        match = pattern.search(text_to_search) #search for the pattern
+        
+        if match:
+
+            header_start_pos = match.start() + start_search_index
+            header_end_pos = match.end() + start_search_index
+            
+            section = {
+                "header": match.group().strip(),
+                "page": i,
+                "start_pos": header_start_pos,
+                "end_pos": header_end_pos,
+                "text" : text_to_search[:header_start_pos]
+            }
+            
+    return None

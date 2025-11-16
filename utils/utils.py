@@ -7,3 +7,11 @@ def find_nth(ch : str , sub : str , occ : int) -> int:
             return -1
 
     return index
+
+
+def get_fin(pages : list) -> int:
+    fin = 0
+    for page in pages:
+        fin = fin + len(page)
+    
+    return fin

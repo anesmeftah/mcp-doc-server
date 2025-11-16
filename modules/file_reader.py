@@ -12,7 +12,7 @@ def read_files(my_path : str) -> list:
                 file_dict = {
                     "file_name" : file , 
                     "metadata" : meta ,
-                    "file_path" : my_path + file
+                    "file_path" : my_path + "/" + file
                 }
                 f.append(file_dict)
 
@@ -27,3 +27,13 @@ def get_file_metadata(file_path : str):
     }
     return result
 
+
+def return_files_names(files : list) -> list:
+    results = []
+    for file in files:
+        results.append(file['file_name'])
+
+    return results
+
+def return_file_path(files : list , num : int) -> str:
+    return (files[num - 1]['file_path'])

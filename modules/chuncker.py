@@ -115,3 +115,15 @@ def find_next_header(pages : list, current_page : int, c_pos : int, header_patte
             return section
             
     return None
+
+
+def sliding_windows(tokens : str , window_size = 150 , step = 100 , min_tokens = 10):
+    windows = []
+    for i in range(0,len(tokens),step):
+        window = tokens[i:i+window_size]
+        if len(window) < min_tokens:
+            break
+        windows.append(window)
+    return windows
+
+

@@ -112,5 +112,6 @@ def find_next_header(pages : list, current_page : int, c_pos : int, header_patte
                 "end_pos": header_end_pos,
                 "text" : text_to_search[:header_start_pos]
             }
+            return section
             
     return None

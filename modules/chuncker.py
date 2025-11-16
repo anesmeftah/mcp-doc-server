@@ -2,6 +2,7 @@ import re
 from ftfy import fix_text
 from utils.utils import find_nth , get_fin
 from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def text_cleaner(text_dict : dict) -> str:
     """ Cleaning text before chunking"""
@@ -126,4 +127,14 @@ def sliding_windows(tokens : str , window_size = 150 , step = 100 , min_tokens =
         windows.append(window)
     return windows
 
+
+def window_vect(windows : list):
+    result = []
+    windows_str = [" ".join(w) for w in windows]
+    tfidf = TfidfVectorizer()
+    result = tfidf.fit_transform(windows_str)
+
+    embeddings = [result[i].toarray().flatten() for i in range(result.shape[0])]
+
+    return embeddings
 

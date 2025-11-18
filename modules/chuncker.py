@@ -69,16 +69,18 @@ def structure_segmentation(pages : list) -> dict:
     header_pattern = r"^(Chapter\s+\d+|Section\s+\d+(\.\d+)*|Part\s+[IVXLC]+|[A-Z][a-zA-Z0-9\s]{1,50}\n[-=]{2,})$"
     c_pos = 0
     current_page = 0
+    id = 0
     e_pos = get_fin(pages)
     while (c_pos < e_pos):
-        section= find_next_header(pages , current_page , c_pos , header_pattern)
+        section= find_next_header(pages , current_page , c_pos , header_pattern , id)
         if section is None:
             break
         sections.append(section)
+        id = id+1
     return sections
 
 
-def find_next_header(pages : list, current_page : int, c_pos : int, header_pattern : str) -> dict:
+def find_next_header(pages : list, current_page : int, c_pos : int, header_pattern : str , id : int) -> dict:
     """Search for the next header"""
     
     try:
@@ -106,6 +108,7 @@ def find_next_header(pages : list, current_page : int, c_pos : int, header_patte
             header_end_pos = match.end() + start_search_index
             
             section = {
+                "id" : id,
                 "header": match.group().strip(),
                 "page": i,
                 "start_pos": header_start_pos,
@@ -116,3 +119,11 @@ def find_next_header(pages : list, current_page : int, c_pos : int, header_patte
             
     return None
 
+def get_section_text(sections : dict , full_text : str) -> str:
+    
+    for i, sec in enumerate(sections):
+        start = sec["start_pos"]
+        end = sections[i+1]["start_pos"] if i+1 < len(sections) else len(full_text)
+        sec["text"] = full_text[start:end]
+
+    return sections

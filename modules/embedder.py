@@ -1,6 +1,9 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
+import nltk
 
-def sliding_windows(tokens : str , window_size = 150 , step = 100 , min_tokens = 10):
+def sliding_windows(text : str , window_size = 150 , step = 100 , min_tokens = 10):
+    assert step <= window_size, "Step cannot be larger than window_size, otherwise no overlap happens."
+    tokens = nltk.word_tokenize(text)
     windows = []
     for i in range(0,len(tokens),step):
         window = tokens[i:i+window_size]

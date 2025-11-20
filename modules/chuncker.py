@@ -64,19 +64,28 @@ def cal_per(liste : list , num_pages : int) -> dict:
     return result
 
 
-def structure_segmentation(pages : list) -> dict:
+def structure_segmentation(pages : list) -> list[dict]:
     sections = []
     header_pattern = r"^(Chapter\s+\d+|Section\s+\d+(\.\d+)*|Part\s+[IVXLC]+|[A-Z][a-zA-Z0-9\s]{1,50}\n[-=]{2,})$"
     c_pos = 0
     current_page = 0
-    id = 0
+    section_id = 0
+    full_text = "\n".join(pages)
     e_pos = get_fin(pages)
     while (c_pos < e_pos):
-        section= find_next_header(pages , current_page , c_pos , header_pattern , id)
+        section = find_next_header(pages, current_page, c_pos, header_pattern, section_id)
         if section is None:
             break
         sections.append(section)
-        id = id+1
+        section_id += 1
+        current_page = section["page"]
+        c_pos = section["end_pos"]
+    print(sections)
+    for i, sec in enumerate(sections):
+        body_start = sec["end_pos"]
+        body_end = sections[i + 1]["start_pos"] if i + 1 < len(sections) else len(full_text)
+        sec["text"] = full_text[body_start:body_end].strip()
+
     return sections
 
 
